@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ResidentCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --bg: #faf7f2;
+  --surface: #ffffff;
+  --surface2: #f3efe8;
+  --surface3: #ece7de;
+  --border: #ddd8ce;
+  --border2: #ccc5b8;
+  --ink: #1c1a17;
+  --ink2: #6b6459;
+  --ink3: #a89e92;
+  --terracotta: #c95f3a;
+  --terra-light: #e8845f;
+  --terra-pale: #faf0eb;
+  --terra-mid: #f2d5c8;
+  --green: #3d7a5a;
+  --green-pale: #e8f2ec;
+  --blue: #3a5fc9;
+  --blue-pale: #ebeffa;
+  --amber: #c98b1a;
+  --amber-pale: #fdf3e0;
+  --radius: 16px;
+  --shadow-sm: 0 1px 4px rgba(28,26,23,0.08);
+  --shadow: 0 4px 20px rgba(28,26,23,0.1);
+  --shadow-lg: 0 12px 40px rgba(28,26,23,0.15);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; animation: fadeUp 0.4s ease both; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════
+   TENANT REPORT SCREEN
+══════════════════════════════ */
+#tenantScreen {
+  background: var(--bg);
+  padding-bottom: 60px;
+}
+
+.tenant-hero {
+  background: var(--terracotta);
+  padding: 36px 24px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tenant-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+
+.tenant-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: -20px;
+  width: 220px; height: 220px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+}
+
+.hero-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 10px;
+}
+
+.hero-title {
+  font-family: 'Fraunces', serif;
+  font-size: 2.2rem;
+  font-weight: 300;
+  color: white;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+.hero-unit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.9);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.tenant-form-wrap {
+  padding: 0 16px;
+  margin-top: -24px;
+  position: relative;
+  z-index: 2;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.form-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+/* STEP INDICATOR */
+.steps-bar {
+  display: flex;
+  padding: 18px 20px 16px;
+  gap: 6px;
+  border-bottom: 1px solid var(--surface2);
+  align-items: center;
+}
+
+.step-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border2);
+  transition: all 0.3s;
+}
+.step-dot.done { background: var(--terracotta); }
+.step-dot.active { width: 24px; border-radius: 4px; background: var(--terracotta); }
+
+.step-label {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--ink3);
+  font-weight: 500;
+}
+
+/* FORM STEPS */
+.form-step { display: none; padding: 20px; }
+.form-step.active { display: block; animation: fadeUp 0.3s ease both; }
+
+.step-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.step-sub {
+  font-size: 0.8rem;
+  color: var(--ink2);
+  margin-bottom: 20px;
+  font-weight: 300;
+}
+
+/* FIELDS */
+.field { margin-bottom: 14px; }
+
+.field label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink2);
+  margin-bottom: 6px;
+}
+
+.field input, .field select, .field textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  padding: 13px 14px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.93rem;
+  color: var(--ink);
+  outline: none;
+  transition: all 0.2s;
+  -webkit-appearance: none;
+}
+
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--terracotta);
+  background: white;
+  box-shadow: 0 0 0 3px var(--terra-mid);
+}
+
+.field textarea { resize: none; min-height: 100px; line-height: 1.6; }
+
+/* CATEGORY GRID */
+.category-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.cat-btn {
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  padding: 13px 10px;
+  background: var(--surface2);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.cat-btn:hover { border-color: var(--border2); background: var(--surface3); }
+.cat-btn.selected { border-color: var(--terracotta); background: var(--terra-pale); color: var(--terracotta); }
+.cat-btn .cat-icon { font-size: 1.3rem; }
+
+/* PRIORITY PILLS */
+.priority-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.pri-btn {
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  padding: 12px 8px;
+  background: var(--surface2);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  font-family: 'Manrope', sans-serif;
+}
+
+.pri-btn .pi { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+.pri-btn .pl { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink2); }
+.pri-btn .pd { font-size: 0.68rem; color: var(--ink3); margin-top: 2px; }
+
+.pri-btn.sel-low { border-color: var(--green); background: var(--green-pale); }
+.pri-btn.sel-low .pl { color: var(--green); }
+.pri-btn.sel-medium { border-color: var(--amber); background: var(--amber-pale); }
+.pri-btn.sel-medium .pl { color: var(--amber); }
+.pri-btn.sel-high { border-color: var(--terracotta); background: var(--terra-pale); }
+.pri-btn.sel-high .pl { color: var(--terracotta); }
+
+/* PHOTO UPLOAD */
+.photo-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 13px;
+  padding: 24px 16px;
+  text-align: center;
+  background: var(--surface2);
+  transition: all 0.2s;
+  position: relative;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.photo-zone:hover, .photo-zone.drag { border-color: var(--terracotta); background: var(--terra-pale); }
+.photo-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.photo-zone-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
+.photo-zone-title { font-size: 0.9rem; font-weight: 600; color: var(--ink); }
+.photo-zone-sub { font-size: 0.75rem; color: var(--ink3); margin-top: 4px; }
+
+.photo-previews-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pthumb {
+  aspect-ratio: 1;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  position: relative;
+}
+.pthumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pthumb-rm {
+  position: absolute;
+  top: 3px; right: 3px;
+  width: 20px; height: 20px;
+  background: rgba(0,0,0,0.65);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* NAV BUTTONS */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-next {
+  flex: 1;
+  padding: 14px;
+  background: var(--terracotta);
+  color: white;
+  border: none;
+  border-radius: 11px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.01em;
+}
+.btn-next:hover { background: var(--terra-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,95,58,0.3); }
+
+.btn-back {
+  padding: 14px 18px;
+  background: var(--surface2);
+  color: var(--ink2);
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-back:hover { background: var(--surface3); }
+
+/* SUCCESS */
+.success-wrap {
+  padding: 40px 20px;
+  text-align: center;
+  display: none;
+}
+.success-wrap.show { display: block; animation: fadeUp 0.4s ease both; }
+
+.success-ring {
+  width: 80px; height: 80px;
+  background: var(--green-pale);
+  border: 3px solid var(--green);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 20px;
+  animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes pop {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.success-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.success-sub { color: var(--ink2); font-size: 0.87rem; font-weight: 300; line-height: 1.6; margin-bottom: 20px; }
+
+.ticket-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--terracotta);
+  letter-spacing: 0.05em;
+  margin-bottom: 24px;
+}
+
+.btn-another {
+  padding: 13px 28px;
+  background: var(--terracotta);
+  color: white;
+  border: none;
+  border-radius: 11px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-another:hover { background: var(--terra-light); }
+
+/* ══════════════════════════════
+   OWNER SCREEN
+══════════════════════════════ */
+#ownerScreen { background: var(--bg); }
+
+.owner-nav {
+  background: var(--ink);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.owner-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: white;
+}
+
+.owner-logo .logo-dot {
+  width: 28px; height: 28px;
+  background: var(--terracotta);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+
+.nav-actions { display: flex; gap: 8px; }
+
+.nav-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+
+.nav-btn-ghost { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
+.nav-btn-ghost:hover { background: rgba(255,255,255,0.15); color: white; }
+.nav-btn-accent { background: var(--terracotta); color: white; }
+.nav-btn-accent:hover { background: var(--terra-light); }
+
+.owner-body { max-width: 1000px; margin: 0 auto; padding: 28px 20px 60px; }
+
+/* OWNER TABS */
+.owner-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 24px;
+  width: fit-content;
+}
+
+.otab {
+  padding: 8px 18px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.otab.active { background: var(--ink); color: white; }
+
+/* STATS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-n {
+  font-family: 'Fraunces', serif;
+  font-size: 2.4rem;
+  font-weight: 300;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-l { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink2); }
+.c-terra { color: var(--terracotta); }
+.c-amber { color: var(--amber); }
+.c-green { color: var(--green); }
+.c-blue { color: var(--blue); }
+
+/* FILTER BAR */
+.filter-bar {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.fbtn {
+  padding: 6px 13px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--ink2);
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.77rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.fbtn:hover { border-color: var(--border2); color: var(--ink); }
+.fbtn.on { background: var(--terra-pale); border-color: var(--terracotta); color: var(--terracotta); }
+
+/* TICKET CARDS (owner) */
+.tickets-stack { display: flex; flex-direction: column; gap: 10px; }
+
+.tcard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.tcard:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: var(--shadow); }
+.tcard.unread { border-left: 3px solid var(--terracotta); }
+
+.tcard-accent {
+  width: 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+.acc-high { background: var(--terracotta); }
+.acc-medium { background: var(--amber); }
+.acc-low { background: var(--green); }
+
+.tcard-body { flex: 1; min-width: 0; }
+
+.tcard-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.tcard-title { font-size: 0.92rem; font-weight: 600; flex: 1; }
+.tcard-desc { font-size: 0.8rem; color: var(--ink2); line-height: 1.4; margin-bottom: 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+.tcard-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.72rem;
+  color: var(--ink3);
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.b-open { background: var(--amber-pale); color: var(--amber); }
+.b-progress { background: var(--blue-pale); color: var(--blue); }
+.b-resolved { background: var(--green-pale); color: var(--green); }
+.b-closed { background: var(--surface3); color: var(--ink3); }
+
+.unread-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--terracotta);
+  flex-shrink: 0;
+  margin-top: 5px;
+  box-shadow: 0 0 6px var(--terracotta);
+}
+
+/* DETAIL PANEL */
+.detail-panel { display: none; }
+.detail-panel.open { display: block; animation: fadeUp 0.3s ease both; }
+
+.detail-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink2);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 18px;
+  width: fit-content;
+  padding: 7px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  transition: all 0.15s;
+}
+.detail-back:hover { border-color: var(--border2); color: var(--ink); }
+
+.detail-layout { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; }
+
+.dcard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.dcard-head {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--surface2);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dcard-body { padding: 16px; }
+
+.info-list { display: flex; flex-direction: column; }
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--surface2);
+  font-size: 0.82rem;
+  gap: 12px;
+}
+.info-item:last-child { border-bottom: none; }
+.info-item .ik { color: var(--ink2); }
+.info-item .iv { font-weight: 600; text-align: right; }
+
+/* THREAD */
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.bubble { max-width: 80%; }
+.bubble.mine { align-self: flex-end; }
+.bubble.theirs { align-self: flex-start; }
+
+.btext {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.mine .btext { background: var(--terracotta); color: white; border-bottom-right-radius: 4px; }
+.theirs .btext { background: var(--surface2); border: 1px solid var(--border); color: var(--ink); border-bottom-left-radius: 4px; }
+
+.bimg { max-width: 200px; border-radius: 10px; display: block; cursor: pointer; margin: 4px 0; border: 1px solid var(--border); }
+
+.bmeta {
+  font-size: 0.67rem;
+  color: var(--ink3);
+  margin-top: 4px;
+  display: flex;
+  gap: 5px;
+}
+.mine .bmeta { justify-content: flex-end; }
+.bsender { font-weight: 600; color: var(--ink2); }
+
+.compose-row {
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  align-items: center;
+}
+
+.compose-row input {
+  flex: 1;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 13px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.85rem;
+  color: var(--ink);
+  outline: none;
+  transition: all 0.2s;
+}
+.compose-row input:focus { border-color: var(--terracotta); background: white; }
+.compose-row input::placeholder { color: var(--ink3); }
+
+.attach-wrap {
+  position: relative;
+  width: 38px; height: 38px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  transition: all 0.15s;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.attach-wrap input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.attach-wrap:hover { border-color: var(--terracotta); background: var(--terra-pale); }
+
+.send-wrap {
+  width: 38px; height: 38px;
+  background: var(--terracotta);
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  color: white;
+}
+.send-wrap:hover { background: var(--terra-light); transform: translateY(-1px); }
+
+.status-sel {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 13px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.87rem;
+  color: var(--ink);
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-bottom: 8px;
+  transition: border-color 0.2s;
+}
+.status-sel:focus { border-color: var(--terracotta); }
+
+.status-hint { font-size: 0.72rem; color: var(--ink3); line-height: 1.4; }
+
+/* QR PAGE */
+.qr-page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.qr-unit-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.qr-unit-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.qr-unit-card p {
+  font-size: 0.75rem;
+  color: var(--ink3);
+  margin-bottom: 14px;
+}
+
+.qr-code-wrap {
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  display: inline-block;
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.qr-print-btn {
+  display: block;
+  width: 100%;
+  padding: 9px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.qr-print-btn:hover { background: var(--terra-pale); border-color: var(--terracotta); color: var(--terracotta); }
+
+/* EMPTY / ALERTS */
+.empty-box {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--ink3);
+}
+.empty-box .ei { font-size: 2.5rem; margin-bottom: 10px; }
+.empty-box p { font-size: 0.85rem; }
+
+.alert-box {
+  background: var(--amber-pale);
+  border: 1px solid rgba(201,139,26,0.25);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.8rem;
+  color: var(--amber);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* LIGHTBOX */
+#lb {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+#lb.open { display: flex; }
+#lb img { max-width: 92vw; max-height: 88vh; border-radius: 10px; }
+#lb-close {
+  position: absolute; top: 18px; right: 20px;
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  color: white; font-size: 1.1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* LOGIN overlay */
+#ownerLogin {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg);
+  background-image: radial-gradient(ellipse at 70% 20%, rgba(201,95,58,0.07) 0%, transparent 50%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  box-shadow: var(--shadow-lg);
+}
+
+.login-card .lc-logo {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 28px;
+}
+.lc-logo .dot { width: 32px; height: 32px; background: var(--terracotta); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.lc-logo span { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 500; }
+
+.login-card h2 { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 500; margin-bottom: 6px; }
+.login-card .sub { font-size: 0.82rem; color: var(--ink2); margin-bottom: 24px; font-weight: 300; }
+.lerr { background: #fff0ee; border: 1px solid var(--terra-mid); color: var(--terracotta); border-radius: 8px; padding: 10px 12px; font-size: 0.8rem; margin-bottom: 14px; display: none; }
+
+@media (max-width: 640px) {
+  .detail-layout { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .qr-page-grid { grid-template-columns: 1fr 1fr; }
+  .owner-body { padding: 18px 14px 50px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════
+  TENANT REPORT SCREEN
+══════════════════════════ -->
+<div class="screen" id="tenantScreen">
+  <div class="tenant-hero">
+    <div class="hero-eyebrow">ResidentCare Portal</div>
+    <div class="hero-title">Report a<br><em>maintenance issue</em></div>
+    <div class="hero-unit" id="heroUnit">🏠 Loading unit…</div>
+  </div>
+
+  <div class="tenant-form-wrap">
+    <div class="form-card">
+
+      <!-- Steps indicator -->
+      <div class="steps-bar" id="stepsBar">
+        <div class="step-dot active" id="sd0"></div>
+        <div class="step-dot" id="sd1"></div>
+        <div class="step-dot" id="sd2"></div>
+        <div class="step-dot" id="sd3"></div>
+        <span class="step-label" id="stepLabel">Step 1 of 4</span>
+      </div>
+
+      <!-- Step 1: Who are you -->
+      <div class="form-step active" id="step0">
+        <div class="step-title">Who are you?</div>
+        <div class="step-sub">We just need your name and a way to update you.</div>
+        <div class="field">
+          <label>Your Name *</label>
+          <input type="text" id="s0name" placeholder="e.g. Sarah Thompson" autocomplete="name">
+        </div>
+        <div class="field">
+          <label>Email (optional — for status updates)</label>
+          <input type="email" id="s0email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label>Best Phone (optional)</label>
+          <input type="tel" id="s0phone" placeholder="(502) 555-0100" autocomplete="tel">
+        </div>
+        <div class="btn-row">
+          <button class="btn-next" onclick="goStep(1)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: What's the issue -->
+      <div class="form-step" id="step1">
+        <div class="step-title">What's the issue?</div>
+        <div class="step-sub">Tap the category that best fits.</div>
+        <div class="category-grid" id="catGrid">
+          <button class="cat-btn" onclick="pickCat(this,'Plumbing')"><span class="cat-icon">🚿</span> Plumbing</button>
+          <button class="cat-btn" onclick="pickCat(this,'Electrical')"><span class="cat-icon">⚡</span> Electrical</button>
+          <button class="cat-btn" onclick="pickCat(this,'Heating & Cooling')"><span class="cat-icon">❄️</span> HVAC</button>
+          <button class="cat-btn" onclick="pickCat(this,'Windows & Doors')"><span class="cat-icon">🪟</span> Windows & Doors</button>
+          <button class="cat-btn" onclick="pickCat(this,'Locks & Security')"><span class="cat-icon">🔑</span> Locks</button>
+          <button class="cat-btn" onclick="pickCat(this,'Pest Control')"><span class="cat-icon">🐛</span> Pests</button>
+          <button class="cat-btn" onclick="pickCat(this,'Appliances')"><span class="cat-icon">🍳</span> Appliances</button>
+          <button class="cat-btn" onclick="pickCat(this,'Other')"><span class="cat-icon">📦</span> Other</button>
+        </div>
+        <div class="field">
+          <label>Brief description *</label>
+          <textarea id="s1desc" placeholder="Describe what's happening — where, when it started, how bad it is…"></textarea>
+        </div>
+        <div class="field">
+          <label>Location in unit</label>
+          <input type="text" id="s1loc" placeholder="e.g. Kitchen, Master Bathroom">
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="goStep(0)">← Back</button>
+          <button class="btn-next" onclick="goStep(2)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Priority + photo -->
+      <div class="form-step" id="step2">
+        <div class="step-title">How urgent is it?</div>
+        <div class="step-sub">And add photos if you have them — they really help.</div>
+        <div class="priority-row">
+          <div class="pri-btn" id="p-low" onclick="pickPri('low')">
+            <span class="pi">🟢</span>
+            <div class="pl">Low</div>
+            <div class="pd">Minor, no rush</div>
+          </div>
+          <div class="pri-btn" id="p-medium" onclick="pickPri('medium')">
+            <span class="pi">🟡</span>
+            <div class="pl">Medium</div>
+            <div class="pd">Needs attention</div>
+          </div>
+          <div class="pri-btn" id="p-high" onclick="pickPri('high')">
+            <span class="pi">🔴</span>
+            <div class="pl">Urgent</div>
+            <div class="pd">Safety / flooding</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Photos (optional)</label>
+          <div class="photo-zone" id="photoZone">
+            <input type="file" multiple accept="image/*" onchange="handlePhotos(event)" id="photoInput">
+            <span class="photo-zone-icon">📷</span>
+            <div class="photo-zone-title">Tap to add photos</div>
+            <div class="photo-zone-sub">Up to 5 images • JPG, PNG, HEIC</div>
+          </div>
+          <div class="photo-previews-grid" id="photoPreviews"></div>
+        </div>
+        <div class="field">
+          <label>Best time to access your unit</label>
+          <select id="s2access">
+            <option>No preference</option>
+            <option>Morning (8am–12pm)</option>
+            <option>Afternoon (12pm–5pm)</option>
+            <option>Evening (5pm–8pm)</option>
+            <option>Weekends only</option>
+            <option>Emergency — anytime</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="goStep(1)">← Back</button>
+          <button class="btn-next" onclick="goStep(3)">Review →</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Review + submit -->
+      <div class="form-step" id="step3">
+        <div class="step-title">Review & send</div>
+        <div class="step-sub">Everything look right?</div>
+        <div id="reviewContent" style="font-size:0.85rem;line-height:1.7;background:var(--surface2);border-radius:11px;padding:14px;margin-bottom:16px;border:1px solid var(--border)"></div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="goStep(2)">← Edit</button>
+          <button class="btn-next" onclick="submitIssue()">Submit Issue ✓</button>
+        </div>
+      </div>
+
+      <!-- Success -->
+      <div class="success-wrap" id="successWrap">
+        <div class="success-ring">✓</div>
+        <div class="success-title">Issue submitted!</div>
+        <div class="success-sub">Your request has been sent to the property manager.<br>You'll receive updates by email if you provided one.</div>
+        <div class="ticket-pill" id="ticketPill">🎫 —</div>
+        <br>
+        <button class="btn-another" onclick="resetForm()">Report Another Issue</button>
+      </div>
+
+    </div>
+
+    <p style="text-align:center;font-size:0.72rem;color:var(--ink3);margin-top:18px;padding-bottom:10px;">ResidentCare · Your issue is private and only visible to your property manager</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+  OWNER LOGIN
+══════════════════════════ -->
+<div id="ownerLogin" style="display:none;">
+  <div class="login-card">
+    <div class="lc-logo">
+      <div class="dot">🏠</div>
+      <span>ResidentCare</span>
+    </div>
+    <h2>Owner portal</h2>
+    <p class="sub">Sign in to manage your property tickets.</p>
+    <div class="lerr" id="lerr">Incorrect email or password.</div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="lemail" placeholder="owner@example.com" onkeydown="if(event.key==='Enter') ownerLogin()">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="lpass" placeholder="••••••••" onkeydown="if(event.key==='Enter') ownerLogin()">
+    </div>
+    <button class="btn-next" style="width:100%;margin-top:4px;" onclick="ownerLogin()">Sign In →</button>
+    <p style="text-align:center;font-size:0.75rem;color:var(--ink3);margin-top:14px;">Demo: owner@example.com / pass</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+  OWNER APP
+══════════════════════════ -->
+<div class="screen" id="ownerScreen">
+  <nav class="owner-nav">
+    <div class="owner-logo"><div class="logo-dot">🏠</div> ResidentCare</div>
+    <div class="nav-actions">
+      <button class="nav-btn nav-btn-ghost" onclick="showOwnerTab('qr')">🔲 QR Codes</button>
+      <button class="nav-btn nav-btn-ghost" onclick="doLogout()">Sign out</button>
+    </div>
+  </nav>
+
+  <div class="owner-body">
+    <!-- Tabs -->
+    <div class="owner-tabs">
+      <button class="otab active" onclick="showOwnerTab('dashboard')" id="ot-dashboard">📊 Dashboard</button>
+      <button class="otab" onclick="showOwnerTab('tickets')" id="ot-tickets">🎫 All Tickets <span id="unreadBadge" style="background:var(--terracotta);color:white;border-radius:10px;padding:1px 7px;font-size:0.68rem;margin-left:4px;"></span></button>
+      <button class="otab" onclick="showOwnerTab('qr')" id="ot-qr">🔲 QR Codes</button>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <div id="ot-dashboard-panel">
+      <div class="stats-row" id="statsRow"></div>
+      <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:500;margin-bottom:14px;">Recent Activity</div>
+      <div id="dashTickets"></div>
+    </div>
+
+    <!-- TICKETS TAB -->
+    <div id="ot-tickets-panel" style="display:none">
+      <div class="filter-bar" id="filterBar"></div>
+      <div id="allTickets"></div>
+    </div>
+
+    <!-- QR TAB -->
+    <div id="ot-qr-panel" style="display:none">
+      <div class="alert-box">📋 Print these and place inside each unit's front door or fridge. Tenants scan to report — no login, no app needed.</div>
+      <div class="qr-page-grid" id="qrGrid"></div>
+    </div>
+
+    <!-- DETAIL PANEL -->
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-back" onclick="closeDetail()">← Back to tickets</div>
+      <div class="detail-layout">
+        <div id="detailMain"></div>
+        <div id="detailSide"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lb" onclick="closeLb()">
+  <button id="lb-close" onclick="closeLb()">✕</button>
+  <img id="lb-img" src="" alt="">
+</div>
+
+<script>
+// ══════════════════════════════════════
+//  CONFIG — edit these for your property
+// ══════════════════════════════════════
+const PROPERTY_NAME = "Maple Grove Apartments";
+const UNITS = ["Apt 1A","Apt 1B","Apt 2A","Apt 2B","Apt 3A","Apt 3B","Apt 4A","Apt 4B","Apt 4C","Apt 5A"];
+const OWNER_EMAIL = "owner@example.com";
+const OWNER_PASS  = "pass";
+const BASE_URL    = window.location.href.split('?')[0]; // auto-detects
+
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+let S = {
+  step: 0,
+  cat: '',
+  pri: '',
+  photos: [],
+  tickets: [
+    { id:'TKT-001', unit:'Apt 4B', name:'Alice Johnson', email:'alice@example.com', phone:'', cat:'Plumbing', loc:'Kitchen', desc:'The kitchen tap has been dripping since Monday. Water pooling under the sink.', pri:'medium', access:'Morning (8am–12pm)', status:'in-progress', date:'Mar 12, 2026', unread:false, msgs:[
+      {from:'owner',name:'Property Manager',text:'Hi Alice — plumber is booked for Thursday morning. Will confirm exact time.',time:'4:01 PM',date:'Mar 13'},
+    ]},
+    { id:'TKT-002', unit:'Apt 4B', name:'Alice Johnson', email:'alice@example.com', phone:'', cat:'Electrical', loc:'Master Bedroom', desc:'Bedroom light has been flickering for a week. Replaced bulb but still happening.', pri:'low', access:'Afternoon', status:'open', date:'Mar 15, 2026', unread:true, msgs:[] },
+    { id:'TKT-003', unit:'Apt 2A', name:'Bob Martinez', email:'bob@example.com', phone:'502-555-0188', cat:'Heating & Cooling', loc:'Living Room', desc:'Heating runs constantly but room stays cold. Very uncomfortable.', pri:'high', access:'Emergency — anytime', status:'open', date:'Mar 16, 2026', unread:true, msgs:[
+      {from:'owner',name:'Property Manager',text:'Bob, arranging HVAC tech — will be in touch by tomorrow morning.',time:'9:00 AM',date:'Mar 17'},
+    ]},
+    { id:'TKT-004', unit:'Apt 2A', name:'Bob Martinez', email:'', phone:'', cat:'Locks & Security', loc:'Front Door', desc:'Deadbolt very stiff and hard to turn.', pri:'medium', access:'No preference', status:'resolved', date:'Mar 8, 2026', unread:false, msgs:[
+      {from:'owner',name:'Property Manager',text:'Lock lubricated and adjusted. Let me know if you have further issues!',time:'3:30 PM',date:'Mar 10'},
+    ]},
+  ],
+  currentTicketId: null,
+  ownerActiveFilter: 'all',
+  ownerTab: 'dashboard',
+};
+
+// ══════════════════════════════════════
+//  ROUTING — decide which screen to show
+// ══════════════════════════════════════
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  const unit = params.get('unit');
+  const mode = params.get('mode');
+
+  if (mode === 'owner') {
+    showOwnerLoginOrApp();
+    return;
+  }
+
+  if (unit) {
+    // Tenant flow
+    show('tenantScreen');
+    const label = decodeURIComponent(unit);
+    document.getElementById('heroUnit').textContent = '🏠 ' + label;
+    document.getElementById('heroUnit').dataset.unit = label;
+  } else {
+    // No params — show owner login (default for the demo)
+    showOwnerLoginOrApp();
+  }
+}
+
+function showOwnerLoginOrApp() {
+  document.getElementById('ownerLogin').style.display = 'flex';
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('ownerLogin').style.display = 'none';
+}
+
+// ══════════════════════════════════════
+//  TENANT FORM
+// ══════════════════════════════════════
+function goStep(n) {
+  // Validation
+  if (n > S.step) {
+    if (S.step === 0 && !document.getElementById('s0name').value.trim()) {
+      alert('Please enter your name.'); return;
+    }
+    if (S.step === 1 && !S.cat) { alert('Please select a category.'); return; }
+    if (S.step === 1 && !document.getElementById('s1desc').value.trim()) { alert('Please add a description.'); return; }
+    if (S.step === 2 && !S.pri) { alert('Please select a priority level.'); return; }
+  }
+
+  if (n === 3) buildReview();
+
+  document.getElementById('step' + S.step).classList.remove('active');
+  S.step = n;
+  document.getElementById('step' + n).classList.add('active');
+  updateSteps();
+}
+
+function updateSteps() {
+  for (let i = 0; i < 4; i++) {
+    const d = document.getElementById('sd' + i);
+    d.className = 'step-dot' + (i < S.step ? ' done' : i === S.step ? ' active' : '');
+  }
+  document.getElementById('stepLabel').textContent = `Step ${S.step + 1} of 4`;
+}
+
+function pickCat(el, cat) {
+  S.cat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function pickPri(p) {
+  S.pri = p;
+  ['low','medium','high'].forEach(x => {
+    document.getElementById('p-' + x).className = 'pri-btn' + (x === p ? ' sel-' + x : '');
+  });
+}
+
+function handlePhotos(e) {
+  const files = Array.from(e.target.files).slice(0, 5 - S.photos.length);
+  files.forEach(f => {
+    const r = new FileReader();
+    r.onload = ev => { S.photos.push(ev.target.result); renderPreviews(); };
+    r.readAsDataURL(f);
+  });
+}
+
+function renderPreviews() {
+  document.getElementById('photoPreviews').innerHTML = S.photos.map((src, i) => `
+    <div class="pthumb">
+      <img src="${src}">
+      <button class="pthumb-rm" onclick="S.photos.splice(${i},1);renderPreviews()">✕</button>
+    </div>
+  `).join('');
+}
+
+function buildReview() {
+  const unit = document.getElementById('heroUnit').dataset.unit || 'Unknown unit';
+  const name = document.getElementById('s0name').value;
+  const email = document.getElementById('s0email').value;
+  const desc = document.getElementById('s1desc').value;
+  const priLabels = { low: '🟢 Low', medium: '🟡 Medium', high: '🔴 Urgent' };
+  document.getElementById('reviewContent').innerHTML = `
+    <b>Unit:</b> ${unit}<br>
+    <b>Name:</b> ${name}<br>
+    ${email ? `<b>Email:</b> ${email}<br>` : ''}
+    <b>Category:</b> ${S.cat}<br>
+    <b>Location:</b> ${document.getElementById('s1loc').value || '—'}<br>
+    <b>Priority:</b> ${priLabels[S.pri]}<br>
+    <b>Access:</b> ${document.getElementById('s2access').value}<br>
+    <b>Photos:</b> ${S.photos.length} attached<br><br>
+    <i>${desc}</i>
+  `;
+}
+
+function submitIssue() {
+  const unit = document.getElementById('heroUnit').dataset.unit || 'Unknown';
+  const name = document.getElementById('s0name').value.trim();
+  const email = document.getElementById('s0email').value.trim();
+  const phone = document.getElementById('s0phone').value.trim();
+  const desc = document.getElementById('s1desc').value.trim();
+  const id = 'TKT-' + String(S.tickets.length + 1).padStart(3, '0');
+  const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  S.tickets.unshift({
+    id, unit, name, email, phone,
+    cat: S.cat,
+    loc: document.getElementById('s1loc').value,
+    desc, pri: S.pri,
+    access: document.getElementById('s2access').value,
+    status: 'open',
+    date,
+    unread: true,
+    photos: [...S.photos],
+    msgs: []
+  });
+
+  // Show success
+  document.getElementById('step3').classList.remove('active');
+  document.getElementById('stepsBar').style.display = 'none';
+  const sw = document.getElementById('successWrap');
+  sw.classList.add('show');
+  document.getElementById('ticketPill').textContent = '🎫 ' + id;
+}
+
+function resetForm() {
+  S.step = 0; S.cat = ''; S.pri = ''; S.photos = [];
+  ['s0name','s0email','s0phone','s1desc','s1loc'].forEach(id => document.getElementById(id).value = '');
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  ['low','medium','high'].forEach(x => document.getElementById('p-' + x).className = 'pri-btn');
+  renderPreviews();
+  document.getElementById('successWrap').classList.remove('show');
+  document.getElementById('stepsBar').style.display = '';
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step0').classList.add('active');
+  updateSteps();
+}
+
+// ══════════════════════════════════════
+//  OWNER AUTH
+// ══════════════════════════════════════
+function ownerLogin() {
+  const e = document.getElementById('lemail').value.trim().toLowerCase();
+  const p = document.getElementById('lpass').value;
+  const err = document.getElementById('lerr');
+  if (e !== OWNER_EMAIL || p !== OWNER_PASS) {
+    err.style.display = 'block'; return;
+  }
+  err.style.display = 'none';
+  document.getElementById('ownerLogin').style.display = 'none';
+  show('ownerScreen');
+  renderOwnerDash();
+  renderOwnerTickets();
+  renderQRCodes();
+  updateUnreadBadge();
+}
+
+function doLogout() {
+  document.getElementById('ownerScreen').classList.remove('active');
+  document.getElementById('ownerLogin').style.display = 'flex';
+}
+
+// ══════════════════════════════════════
+//  OWNER UI
+// ══════════════════════════════════════
+function showOwnerTab(tab) {
+  S.ownerTab = tab;
+  ['dashboard','tickets','qr'].forEach(t => {
+    document.getElementById('ot-' + t).classList.toggle('active', t === tab);
+    document.getElementById('ot-' + t + '-panel').style.display = t === tab ? '' : 'none';
+  });
+  document.getElementById('detailPanel').classList.remove('open');
+  if (tab === 'tickets') renderOwnerTickets();
+}
+
+function renderOwnerDash() {
+  const all = S.tickets;
+  const open = all.filter(t => t.status === 'open').length;
+  const prog = all.filter(t => t.status === 'in-progress').length;
+  const res = all.filter(t => t.status === 'resolved' || t.status === 'closed').length;
+  const urgent = all.filter(t => t.pri === 'high' && t.status !== 'resolved' && t.status !== 'closed').length;
+
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat"><div class="stat-n c-terra">${all.length}</div><div class="stat-l">Total</div></div>
+    <div class="stat"><div class="stat-n c-amber">${open}</div><div class="stat-l">Open</div></div>
+    <div class="stat"><div class="stat-n c-blue">${prog}</div><div class="stat-l">In Progress</div></div>
+    <div class="stat"><div class="stat-n c-green">${res}</div><div class="stat-l">Resolved</div></div>
+    <div class="stat"><div class="stat-n c-terra">${urgent}</div><div class="stat-l">Urgent</div></div>
+  `;
+
+  document.getElementById('dashTickets').innerHTML = renderCardList(S.tickets.slice(0, 6));
+}
+
+function renderOwnerTickets() {
+  const filters = ['all','open','in-progress','resolved','high'];
+  document.getElementById('filterBar').innerHTML = filters.map(f => `
+    <button class="fbtn ${S.ownerActiveFilter === f ? 'on' : ''}" onclick="setFilter('${f}')">
+      ${f === 'all' ? 'All' : f === 'in-progress' ? 'In Progress' : f === 'high' ? '🔴 Urgent' : f.charAt(0).toUpperCase() + f.slice(1)}
+    </button>
+  `).join('');
+
+  let list = S.tickets;
+  if (S.ownerActiveFilter !== 'all') {
+    if (S.ownerActiveFilter === 'high') list = list.filter(t => t.pri === 'high');
+    else list = list.filter(t => t.status === S.ownerActiveFilter);
+  }
+
+  document.getElementById('allTickets').innerHTML = list.length
+    ? renderCardList(list)
+    : '<div class="empty-box"><div class="ei">✅</div><p>No tickets match this filter.</p></div>';
+}
+
+function setFilter(f) {
+  S.ownerActiveFilter = f;
+  renderOwnerTickets();
+}
+
+function renderCardList(tickets) {
+  if (!tickets.length) return '<div class="empty-box"><div class="ei">📭</div><p>No tickets yet.</p></div>';
+  return '<div class="tickets-stack">' + tickets.map(t => `
+    <div class="tcard ${t.unread ? 'unread' : ''}" onclick="openDetail('${t.id}')">
+      <div class="tcard-accent acc-${t.pri}"></div>
+      <div class="tcard-body">
+        <div class="tcard-top">
+          <div class="tcard-title">${t.title || t.cat + ' — ' + t.loc}</div>
+          ${t.unread ? '<div class="unread-dot"></div>' : ''}
+          <span class="badge b-${t.status}">${t.status === 'in-progress' ? 'In Progress' : t.status.charAt(0).toUpperCase() + t.status.slice(1)}</span>
+        </div>
+        <div class="tcard-desc">${t.desc}</div>
+        <div class="tcard-meta">
+          <span>🏠 ${t.unit}</span>
+          <span>👤 ${t.name}</span>
+          <span>📂 ${t.cat}</span>
+          <span>📅 ${t.date}</span>
+          ${t.msgs.length ? `<span>💬 ${t.msgs.length}</span>` : ''}
+          ${t.photos && t.photos.length ? `<span>📷 ${t.photos.length}</span>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('') + '</div>';
+}
+
+function updateUnreadBadge() {
+  const n = S.tickets.filter(t => t.unread).length;
+  document.getElementById('unreadBadge').textContent = n || '';
+  document.getElementById('unreadBadge').style.display = n ? '' : 'none';
+}
+
+// ══════════════════════════════════════
+//  TICKET DETAIL
+// ══════════════════════════════════════
+function openDetail(id) {
+  const t = S.tickets.find(x => x.id === id);
+  if (!t) return;
+  S.currentTicketId = id;
+  t.unread = false;
+  updateUnreadBadge();
+
+  // Main column
+  const photosHtml = t.photos && t.photos.length
+    ? `<div class="dcard"><div class="dcard-head">Photos</div><div class="dcard-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px">
+          ${t.photos.map(src => `<div class="pthumb" onclick="openLb('${src}')"><img src="${src}"></div>`).join('')}
+        </div></div></div>` : '';
+
+  document.getElementById('detailMain').innerHTML = `
+    <div class="dcard">
+      <div class="dcard-head">${t.cat} — ${t.loc || 'Unspecified location'}</div>
+      <div class="dcard-body" style="font-size:0.87rem;line-height:1.65;color:var(--ink2)">${t.desc}</div>
+    </div>
+    ${photosHtml}
+    <div class="dcard" id="threadCard">
+      <div class="dcard-head">Messages <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;color:var(--ink3)">Two-way with tenant</span></div>
+      <div class="thread" id="thread"></div>
+      <div class="compose-row">
+        <div class="attach-wrap" title="Attach image">📎<input type="file" accept="image/*" onchange="sendImg(event)"></div>
+        <input type="text" id="msgBox" placeholder="Type a message…" onkeydown="if(event.key==='Enter') sendMsg()">
+        <button class="send-wrap" onclick="sendMsg()">↑</button>
+      </div>
+    </div>
+  `;
+
+  // Side column
+  document.getElementById('detailSide').innerHTML = `
+    <div class="dcard">
+      <div class="dcard-head">Ticket Info</div>
+      <div class="dcard-body">
+        <div class="info-list">
+          <div class="info-item"><span class="ik">ID</span><span class="iv">${t.id}</span></div>
+          <div class="info-item"><span class="ik">Unit</span><span class="iv">${t.unit}</span></div>
+          <div class="info-item"><span class="ik">Tenant</span><span class="iv">${t.name}</span></div>
+          ${t.email ? `<div class="info-item"><span class="ik">Email</span><span class="iv" style="font-size:0.77rem">${t.email}</span></div>` : ''}
+          ${t.phone ? `<div class="info-item"><span class="ik">Phone</span><span class="iv">${t.phone}</span></div>` : ''}
+          <div class="info-item"><span class="ik">Priority</span><span class="iv">${t.pri.charAt(0).toUpperCase()+t.pri.slice(1)}</span></div>
+          <div class="info-item"><span class="ik">Access</span><span class="iv" style="font-size:0.77rem">${t.access}</span></div>
+          <div class="info-item"><span class="ik">Submitted</span><span class="iv">${t.date}</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="dcard">
+      <div class="dcard-head">Update Status</div>
+      <div class="dcard-body">
+        <select class="status-sel" id="statusSel" onchange="updateStatus(this.value)">
+          <option value="open" ${t.status==='open'?'selected':''}>Open</option>
+          <option value="in-progress" ${t.status==='in-progress'?'selected':''}>In Progress</option>
+          <option value="resolved" ${t.status==='resolved'?'selected':''}>Resolved</option>
+          <option value="closed" ${t.status==='closed'?'selected':''}>Closed</option>
+        </select>
+        <p class="status-hint">Changing status sends an automatic message to the tenant thread.</p>
+      </div>
+    </div>
+  `;
+
+  renderThread(t);
+
+  // Show detail, hide list
+  document.getElementById('ot-dashboard-panel').style.display = 'none';
+  document.getElementById('ot-tickets-panel').style.display = 'none';
+  document.getElementById('ot-qr-panel').style.display = 'none';
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('open');
+  showOwnerTab(S.ownerTab);
+}
+
+function renderThread(t) {
+  const thread = document.getElementById('thread');
+  if (!thread) return;
+  if (!t.msgs.length) {
+    thread.innerHTML = '<div style="text-align:center;padding:28px;color:var(--ink3);font-size:0.8rem;">No messages yet. Send one below.</div>';
+    return;
+  }
+  thread.innerHTML = t.msgs.map(m => {
+    const mine = m.from === 'owner';
+    const body = m.img
+      ? `<img src="${m.img}" class="bimg" onclick="openLb('${m.img}')">`
+      : `<div class="btext">${m.text}</div>`;
+    return `
+      <div class="bubble ${mine ? 'mine' : 'theirs'}">
+        ${body}
+        <div class="bmeta">
+          ${!mine ? `<span class="bsender">${m.name}</span>` : ''}
+          <span>${m.date}, ${m.time}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function sendMsg() {
+  const box = document.getElementById('msgBox');
+  const text = box.value.trim();
+  if (!text) return;
+  const t = S.tickets.find(x => x.id === S.currentTicketId);
+  const now = new Date();
+  t.msgs.push({ from: 'owner', name: 'Property Manager', text, time: now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}), date: now.toLocaleDateString('en-US',{month:'short',day:'numeric'}) });
+  box.value = '';
+  renderThread(t);
+}
+
+function sendImg(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    const t = S.tickets.find(x => x.id === S.currentTicketId);
+    const now = new Date();
+    t.msgs.push({ from:'owner', name:'Property Manager', img: ev.target.result, time: now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}), date: now.toLocaleDateString('en-US',{month:'short',day:'numeric'}) });
+    e.target.value = '';
+    renderThread(t);
+  };
+  r.readAsDataURL(file);
+}
+
+function updateStatus(val) {
+  const t = S.tickets.find(x => x.id === S.currentTicketId);
+  if (!t) return;
+  t.status = val;
+  const msgs = { open:'Ticket re-opened.', 'in-progress':'We\'re now working on this — will keep you updated.', resolved:'Great news — this issue has been resolved. Please let us know if anything else comes up!', closed:'This ticket has been closed.' };
+  const now = new Date();
+  t.msgs.push({ from:'owner', name:'Property Manager', text:'📋 Status update: ' + msgs[val], time: now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}), date: now.toLocaleDateString('en-US',{month:'short',day:'numeric'}) });
+  renderThread(t);
+  renderOwnerDash();
+}
+
+// ══════════════════════════════════════
+//  QR CODES
+// ══════════════════════════════════════
+function renderQRCodes() {
+  const grid = document.getElementById('qrGrid');
+  grid.innerHTML = '';
+
+  UNITS.forEach(unit => {
+    const url = BASE_URL + '?unit=' + encodeURIComponent(unit);
+    const card = document.createElement('div');
+    card.className = 'qr-unit-card';
+    card.innerHTML = `
+      <h3>${unit}</h3>
+      <p>${PROPERTY_NAME}</p>
+      <div class="qr-code-wrap" id="qr-${unit.replace(/\s/g,'-')}"></div>
+      <button class="qr-print-btn" onclick="printQR('${unit}','${url}')">🖨️ Print this card</button>
+    `;
+    grid.appendChild(card);
+
+    // Generate QR
+    setTimeout(() => {
+      new QRCode(document.getElementById('qr-' + unit.replace(/\s/g,'-')), {
+        text: url, width: 130, height: 130,
+        colorDark: '#1c1a17', colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }, 50);
+  });
+}
+
+function printQR(unit, url) {
+  const win = window.open('', '_blank');
+  win.document.write(`
+    <html><head><title>QR Code — ${unit}</title>
+    <style>
+      body { font-family: Georgia, serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: white; }
+      .card { border: 2px solid #333; border-radius: 16px; padding: 32px 28px; text-align: center; max-width: 280px; }
+      h1 { font-size: 1.8rem; margin-bottom: 4px; }
+      .prop { font-size: 0.9rem; color: #666; margin-bottom: 20px; }
+      .instr { font-size: 0.85rem; color: #444; margin-top: 18px; line-height: 1.6; }
+      .url { font-size: 0.65rem; color: #999; margin-top: 8px; word-break: break-all; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+    </head><body>
+    <div class="card">
+      <h1>${unit}</h1>
+      <div class="prop">${PROPERTY_NAME}</div>
+      <div id="qr"></div>
+      <div class="instr">📱 Scan to report a<br>maintenance issue</div>
+      <div class="url">${url}</div>
+    </div>
+    <script>
+      new QRCode(document.getElementById('qr'), { text: '${url}', width: 180, height: 180, colorDark: '#1c1a17', colorLight: '#ffffff' });
+      setTimeout(() => window.print(), 600);
+    <\/script>
+    </body></html>
+  `);
+  win.document.close();
+}
+
+// ══════════════════════════════════════
+//  LIGHTBOX
+// ══════════════════════════════════════
+function openLb(src) {
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lb').classList.add('open');
+}
+function closeLb() { document.getElementById('lb').classList.remove('open'); }
+
+// ══════════════════════════════════════
+//  START
+// ══════════════════════════════════════
+init();
+</script>
+</body>
+</html>
